@@ -5,4 +5,5 @@
     <string name="title_activity_teste">TesteActivity</string>
     <string name="searchbar_hint">Pesquisar…</string>
     <string name="action_search">Pesquisar</string>
+    <string name="action_about">About</string>
 </resources>

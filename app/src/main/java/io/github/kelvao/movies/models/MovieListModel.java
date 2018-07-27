@@ -11,6 +11,7 @@ public class MovieListModel {
 
     @SerializedName("Search")
     private ArrayList<Movie> movies;
+    private int totalResults;
 
     public ArrayList<Movie> getMovies() {
         return movies;
@@ -18,6 +19,14 @@ public class MovieListModel {
 
     public void setMovies(ArrayList<Movie> movies) {
         this.movies = movies;
+    }
+
+    public int getTotalResults() {
+        return totalResults;
+    }
+
+    public void setTotalResults(int totalResults) {
+        this.totalResults = totalResults;
     }
 
     public class Movie {

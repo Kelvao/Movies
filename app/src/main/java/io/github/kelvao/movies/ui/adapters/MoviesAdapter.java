@@ -95,6 +95,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         loading = false;
     }
 
+
     @Override
     public int getItemCount() {
         return movieList == null ? 0 : movieList.size();

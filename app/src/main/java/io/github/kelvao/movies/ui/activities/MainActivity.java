@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -15,6 +16,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     private MovieList.Presenter presenter;
     private MoviesAdapter adapter;
     private ArrayList<MovieListModel.Movie> movieList;
-    private String query;
+    private SharedPreferences prefs = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
         if (isShow) {
             anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
             showSoftKeyboard();
+            et_query.requestFocus();
         } else {
             anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
             hideSoftKeyboard();
@@ -166,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv_movies.getContext(),
                 linearLayoutManager.getOrientation());
         rv_movies.addItemDecoration(dividerItemDecoration);
-        adapter = new MoviesAdapter(movieList, rv_movies,this);
+        adapter = new MoviesAdapter(movieList, rv_movies, this);
         adapter.setOnLoadMoreListener(this);
         rv_movies.setAdapter(adapter);
     }
@@ -181,12 +184,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
 
     @Override
     public void setMovieList(ArrayList<MovieListModel.Movie> movieList) {
+        adapter.setLoaded();
         if (movieList != null) {
+            this.movieList.remove(null);
             this.movieList.addAll(movieList);
             adapter.notifyDataSetChanged();
         }
         updateUi(false);
-        runLayoutAnimation(rv_movies);
     }
 
     @Override
@@ -195,6 +199,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
         tv_empty.setVisibility(movieList.size() == 0 && !isLoading ? View.VISIBLE : View.GONE);
         rv_movies.setVisibility(movieList.size() == 0 || isLoading ? View.GONE : View.VISIBLE);
         pg_movies.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void runLayoutAnimation() {
+        final Context context = rv_movies.getContext();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_from_bottom);
+        rv_movies.setLayoutAnimation(controller);
+        rv_movies.getAdapter().notifyDataSetChanged();
+        rv_movies.scheduleLayoutAnimation();
     }
 
     @Override
@@ -211,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     public void onFailed(String message) {
         updateUi(false);
         Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-        snackbar.setAction("RETRY", view -> queryMovies(query));
-        snackbar.setActionTextColor(Color.RED);
         View sbView = snackbar.getView();
         sbView.setBackgroundColor(Color.WHITE);
         TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
@@ -221,26 +233,17 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     }
 
     private void queryMovies(String title) {
-        query = title;
         updateUi(true);
         clearMovieList();
         presenter.getMoviesList(title);
     }
 
     private void clearMovieList() {
+        rv_movies.getLayoutManager().scrollToPosition(0);
+        Log.i("TESTE", "queryMovies: ");
         int size = movieList.size();
         movieList.clear();
         adapter.notifyItemRangeRemoved(0, size);
-        rv_movies.getLayoutManager().scrollToPosition(0);
-    }
-
-    private void runLayoutAnimation(final RecyclerView recyclerView) {
-        final Context context = recyclerView.getContext();
-        final LayoutAnimationController controller =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_from_bottom);
-        recyclerView.setLayoutAnimation(controller);
-        recyclerView.getAdapter().notifyDataSetChanged();
-        recyclerView.scheduleLayoutAnimation();
     }
 
     public void showSoftKeyboard() {
@@ -259,5 +262,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     @Override
     public void onLoadMore() {
         presenter.getMoreMovies();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (prefs.getBoolean("firstrun", true)) {
+
+            prefs.edit().putBoolean("firstrun", false).apply();
+        }
     }
 }

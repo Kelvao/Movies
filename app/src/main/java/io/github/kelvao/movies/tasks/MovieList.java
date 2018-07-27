@@ -10,14 +10,14 @@ public interface MovieList {
 
         void updateUi(Boolean isLoading);
 
+        void runLayoutAnimation();
+
         void onSuccess();
 
         void onFailed(String message);
     }
 
     interface Presenter {
-        void getMovie(String title);
-
         void getMoviesList(String title);
 
         void getMoreMovies();
