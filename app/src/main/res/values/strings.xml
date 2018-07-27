@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Movies</string>
+    <string name="welcome">Procure um ou mais filmes utilizando a barra de pesquisa acima.</string>
+    <string name="movie_list_empty">A busca retornou nenhum resultado.</string>
+    <string name="title_activity_teste">TesteActivity</string>
+    <string name="searchbar_hint">Pesquisar…</string>
+    <string name="action_search">Pesquisar</string>
 </resources>

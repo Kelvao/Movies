@@ -2,41 +2,60 @@ package io.github.kelvao.movies.models;
 
 import android.net.Uri;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+
+@SuppressWarnings("unused")
 public class MovieListModel {
-    private String title;
-    private String year;
-    private String imdbID;
-    private String poster;
 
-    public String getTitle() {
-        return title;
+    @SerializedName("Search")
+    private ArrayList<Movie> movies;
+
+    public ArrayList<Movie> getMovies() {
+        return movies;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setMovies(ArrayList<Movie> movies) {
+        this.movies = movies;
     }
 
-    public String getYear() {
-        return year;
-    }
+    public class Movie {
+        private String Title;
+        private String Year;
+        private String imdbID;
+        private String Poster;
 
-    public void setYear(String year) {
-        this.year = year;
-    }
+        public String getTitle() {
+            return Title;
+        }
 
-    public String getImdbID() {
-        return imdbID;
-    }
+        public void setTitle(String title) {
+            Title = title;
+        }
 
-    public void setImdbID(String imdbID) {
-        this.imdbID = imdbID;
-    }
+        public String getYear() {
+            return Year;
+        }
 
-    public Uri getPoster() {
-        return Uri.parse(poster);
-    }
+        public void setYear(String year) {
+            Year = year;
+        }
 
-    public void setPoster(String poster) {
-        this.poster = poster;
+        public String getImdbID() {
+            return imdbID;
+        }
+
+        public void setImdbID(String imdbID) {
+            this.imdbID = imdbID;
+        }
+
+        public Uri getPoster() {
+            return Uri.parse(Poster);
+        }
+
+        public void setPoster(String poster) {
+            Poster = poster;
+        }
     }
 }

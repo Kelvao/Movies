@@ -1,6 +1,7 @@
 package io.github.kelvao.movies.ui.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,44 +17,92 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.github.kelvao.movies.R;
 import io.github.kelvao.movies.models.MovieListModel;
-import io.github.kelvao.movies.utils.GlideApp;
+import io.github.kelvao.movies.tasks.OnLoadMoreListener;
+import io.github.kelvao.movies.ui.utils.GlideApp;
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
+public class MoviesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<MovieListModel> movieList;
-    private Callback callback;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int VIEW_LOAD = 0;
+    private final int VIEW_ITEM = 1;
+    private ArrayList<MovieListModel.Movie> movieList;
+    private final int visibleThreshold = 5;
+    private int lastVisibleItem, totalItemCount;
+    private boolean loading;
+    private OnLoadMoreListener onLoadMoreListener;
+    private final Callback callback;
 
-    public MoviesAdapter(ArrayList<MovieListModel> movieList, Callback callback) {
+
+    public MoviesAdapter(ArrayList<MovieListModel.Movie> movieList, RecyclerView rv_movies, Callback callback) {
         this.movieList = movieList;
         this.callback = callback;
+        if (rv_movies.getLayoutManager() instanceof LinearLayoutManager) {
+            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rv_movies.getLayoutManager();
+            rv_movies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager
+                            .findLastVisibleItemPosition();
+                    if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
+                        }
+                        loading = true;
+                    }
+                }
+            });
+        }
     }
 
     @NonNull
     @Override
-    public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MovieViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == VIEW_ITEM) {
+            return new MovieViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false));
+        } else {
+            return new LoadingViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_item, parent, false));
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-        final MovieListModel movie = movieList.get(position);
-        final View movieItem = holder.itemView;
-        GlideApp.with(movieItem.getContext())
-                .load(movie.getPoster())
-                .error(movieItem.getContext().getDrawable(R.drawable.ic_error))
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.iv_poster);
-        holder.tv_name_year.setText(String.format("%s (%s)", movie.getTitle(), movie.getYear()));
-        movieItem.setOnClickListener(view -> callback.onItemClick(movie));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (getItemViewType(position) == VIEW_ITEM) {
+            final MovieListModel.Movie movie = movieList.get(position);
+            final View movieItem = holder.itemView;
+            final MovieViewHolder movieViewHolder = (MovieViewHolder) holder;
+            GlideApp.with(movieItem.getContext())
+                    .load(movie.getPoster())
+                    .centerCrop()
+                    .error(movieItem.getContext().getDrawable(R.drawable.ic_broken_image))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(movieViewHolder.iv_poster);
+            movieViewHolder.tv_name_year.setText(String.format("%s (%s)", movie.getTitle(), movie.getYear()));
+            movieItem.setOnClickListener(view -> callback.onItemClick(movie));
+        }
     }
 
-    public interface Callback{
-        void onItemClick(MovieListModel movie);
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
+    }
+
+    public interface Callback {
+        void onItemClick(MovieListModel.Movie movie);
+    }
+
+    public void setLoaded() {
+        loading = false;
     }
 
     @Override
     public int getItemCount() {
         return movieList == null ? 0 : movieList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return movieList.get(position) == null ? VIEW_LOAD : VIEW_ITEM;
     }
 
     class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -66,6 +115,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         MovieViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        LoadingViewHolder(View itemView) {
+            super(itemView);
         }
     }
 }
