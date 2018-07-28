@@ -6,8 +6,6 @@ public interface Movie {
     interface View {
         void showMovie(MovieModel movie);
 
-        void onSuccess();
-
         void onFailed(String message);
     }
 

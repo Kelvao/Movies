@@ -4,70 +4,46 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
+
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
 import io.github.kelvao.movies.R;
-import io.github.kelvao.movies.models.MovieListModel;
-import io.github.kelvao.movies.presenters.MovieListPresenter;
-import io.github.kelvao.movies.tasks.MovieList;
-import io.github.kelvao.movies.tasks.OnLoadMoreListener;
-import io.github.kelvao.movies.ui.adapters.MoviesAdapter;
+import io.github.kelvao.movies.ui.fragments.MovieListFragment;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.Callback, MovieList.View, OnLoadMoreListener {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
-    @BindView(R.id.tv_welcome)
-    TextView tv_welcome;
-    @BindView(R.id.tv_empty)
-    TextView tv_empty;
-    @BindView(R.id.rv_movies)
-    RecyclerView rv_movies;
-    @BindView(R.id.pg_movies)
-    ProgressBar pg_movies;
-    @BindView(R.id.cl_movies)
-    CoordinatorLayout coordinatorLayout;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
     @BindView(R.id.search_toolbar)
     ConstraintLayout search_toolbar;
     @BindView(R.id.et_query)
     EditText et_query;
     @BindView(R.id.iv_back)
     ImageView iv_back;
-    @BindView(R.id.iv_close)
-    ImageView iv_close;
-    private MovieList.Presenter presenter;
-    private MoviesAdapter adapter;
-    private ArrayList<MovieListModel.Movie> movieList;
-    private SharedPreferences prefs = null;
+    @BindView(R.id.iv_clear)
+    ImageView iv_clear;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    private MovieListFragment movieListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,19 +51,26 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        movieList = new ArrayList<>();
-        presenter = new MovieListPresenter(this);
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        movieListFragment = MovieListFragment.newInstance(null);
+        initFragment();
         initSearchToolbar();
-        initRecyclerView();
     }
 
+    private void initFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.cfl_container, MovieListFragment.newInstance(et_query.getText().toString()))
+                .commit();
+    }
+
+
     private void initSearchToolbar() {
-        iv_back.setOnClickListener(view -> circleReveal(R.id.search_toolbar, 1, true, false));
-        iv_close.setOnClickListener(view -> et_query.getText().clear());
+        iv_back.setOnClickListener(view -> circleReveal(false));
+        iv_clear.setOnClickListener(view -> et_query.getText().clear());
         et_query.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 if (!"".equals(et_query.getText().toString())) {
-                    queryMovies(et_query.getText().toString());
+                    initFragment();
                     hideSoftKeyboard();
                     return true;
                 }
@@ -97,49 +80,29 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        if (search_toolbar.getVisibility() == View.VISIBLE) {
-            circleReveal(R.id.search_toolbar, 1, true, false);
+    @OnTextChanged(value = R.id.et_query, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    public void afterQueryTextChanged(Editable editable) {
+        if (editable.toString().isEmpty()) {
+            iv_clear.setVisibility(View.INVISIBLE);
         } else {
-            super.onBackPressed();
+            iv_clear.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_search) {
-            circleReveal(R.id.search_toolbar, 1, true, true);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("PrivateResource")
-    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
-        final View myView = findViewById(viewID);
-        int width = myView.getWidth();
-        if (posFromRight > 0) {
-            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
-        }
-        if (containsOverflow) {
-            width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
-        }
+    public void circleReveal(final boolean isShow) {
+        int width = search_toolbar.getWidth();
+        width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 4);
+        width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
         int cx = width;
-        int cy = myView.getHeight() / 2;
+        int cy = search_toolbar.getHeight() / 2;
         Animator anim;
         if (isShow) {
-            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
+            anim = ViewAnimationUtils.createCircularReveal(search_toolbar, cx, cy, 0, (float) width);
             showSoftKeyboard();
             et_query.requestFocus();
         } else {
-            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
+            anim = ViewAnimationUtils.createCircularReveal(search_toolbar, cx, cy, (float) width, 0);
             hideSoftKeyboard();
         }
         anim.setDuration((long) 220);
@@ -149,101 +112,48 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
             public void onAnimationEnd(Animator animation) {
                 if (!isShow) {
                     super.onAnimationEnd(animation);
-                    myView.setVisibility(View.INVISIBLE);
+                    search_toolbar.setVisibility(View.INVISIBLE);
                 }
             }
         });
         // make the view visible and start the animation
         if (isShow) {
-            myView.setVisibility(View.VISIBLE);
+            search_toolbar.setVisibility(View.VISIBLE);
         }
         // start the animation
         anim.start();
     }
 
-    private void initRecyclerView() {
-        rv_movies.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rv_movies.setLayoutManager(linearLayoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv_movies.getContext(),
-                linearLayoutManager.getOrientation());
-        rv_movies.addItemDecoration(dividerItemDecoration);
-        adapter = new MoviesAdapter(movieList, rv_movies, this);
-        adapter.setOnLoadMoreListener(this);
-        rv_movies.setAdapter(adapter);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void onItemClick(MovieListModel.Movie movie) {
-        Bundle bundle = new Bundle();
-        bundle.putString("ImdbID", movie.getImdbID());
-        startActivity(new Intent(MainActivity.this, MovieActivity.class).putExtras(bundle));
-        finish();
-    }
-
-    @Override
-    public void setMovieList(ArrayList<MovieListModel.Movie> movieList) {
-        adapter.setLoaded();
-        if (movieList != null) {
-            this.movieList.remove(null);
-            this.movieList.addAll(movieList);
-            adapter.notifyDataSetChanged();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                popFragment();
+                break;
+            case R.id.action_search:
+                circleReveal(true);
+                return true;
+            case R.id.action_about:
+                new LibsBuilder()
+                        .withAboutIconShown(true)
+                        .withAboutAppName(getResources().getString(R.string.app_name))
+                        .withActivityTitle(getResources().getString(R.string.about))
+                        .withAboutVersionShown(true)
+                        .withLicenseShown(true)
+                        .withVersionShown(true)
+                        .withAutoDetect(true)
+                        .withActivityStyle(Libs.ActivityStyle.DARK)
+                        .start(this);
+                break;
         }
-        updateUi(false);
-    }
-
-    @Override
-    public void updateUi(Boolean isLoading) {
-        tv_welcome.setVisibility(View.GONE);
-        tv_empty.setVisibility(movieList.size() == 0 && !isLoading ? View.VISIBLE : View.GONE);
-        rv_movies.setVisibility(movieList.size() == 0 || isLoading ? View.GONE : View.VISIBLE);
-        pg_movies.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void runLayoutAnimation() {
-        final Context context = rv_movies.getContext();
-        final LayoutAnimationController controller =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_from_bottom);
-        rv_movies.setLayoutAnimation(controller);
-        rv_movies.getAdapter().notifyDataSetChanged();
-        rv_movies.scheduleLayoutAnimation();
-    }
-
-    @Override
-    public void onSuccess() {
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Pesquisa concluída", Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        sbView.setBackgroundColor(Color.WHITE);
-        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.BLACK);
-        snackbar.show();
-    }
-
-    @Override
-    public void onFailed(String message) {
-        updateUi(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        sbView.setBackgroundColor(Color.WHITE);
-        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.RED);
-        snackbar.show();
-    }
-
-    private void queryMovies(String title) {
-        updateUi(true);
-        clearMovieList();
-        presenter.getMoviesList(title);
-    }
-
-    private void clearMovieList() {
-        rv_movies.getLayoutManager().scrollToPosition(0);
-        Log.i("TESTE", "queryMovies: ");
-        int size = movieList.size();
-        movieList.clear();
-        adapter.notifyItemRangeRemoved(0, size);
+        return super.onOptionsItemSelected(item);
     }
 
     public void showSoftKeyboard() {
@@ -252,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     }
 
     public void hideSoftKeyboard() {
-        View view = this.getCurrentFocus();
+        View view = getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             Objects.requireNonNull(imm).hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -260,16 +170,36 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Cal
     }
 
     @Override
-    public void onLoadMore() {
-        presenter.getMoreMovies();
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            popFragment();
+        } else {
+            if (search_toolbar.getVisibility() == View.VISIBLE) {
+                circleReveal(false);
+            } else {
+                super.onBackPressed();
+            }
+        }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (prefs.getBoolean("firstrun", true)) {
-
-            prefs.edit().putBoolean("firstrun", false).apply();
+    public void onBackStackChanged() {
+        Log.i("TESTE", "onBackStackChanged: " + getSupportFragmentManager().getBackStackEntryCount());
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            if (search_toolbar.getVisibility() == View.VISIBLE) {
+                circleReveal(false);
+            }
+        } else {
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         }
     }
+
+    public void popFragment() {
+        getSupportFragmentManager().popBackStackImmediate();
+        getSupportFragmentManager().beginTransaction()
+                .show(movieListFragment)
+                .commit();
+    }
+
 }

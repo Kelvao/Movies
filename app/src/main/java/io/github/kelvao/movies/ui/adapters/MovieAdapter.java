@@ -20,7 +20,7 @@ import io.github.kelvao.movies.models.MovieListModel;
 import io.github.kelvao.movies.tasks.OnLoadMoreListener;
 import io.github.kelvao.movies.ui.utils.GlideApp;
 
-public class MoviesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final int VIEW_LOAD = 0;
@@ -33,7 +33,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private final Callback callback;
 
 
-    public MoviesAdapter(ArrayList<MovieListModel.Movie> movieList, RecyclerView rv_movies, Callback callback) {
+    public MovieAdapter(ArrayList<MovieListModel.Movie> movieList, RecyclerView rv_movies, Callback callback) {
         this.movieList = movieList;
         this.callback = callback;
         if (rv_movies.getLayoutManager() instanceof LinearLayoutManager) {

@@ -39,7 +39,7 @@ public class MoviePresenter implements Movie.Presenter {
             public void onResponse(@NonNull Call<MovieModel> call, @NonNull Response<MovieModel> response) {
                 final MovieModel movie = response.body();
                 if (response.isSuccessful() && movie != null) {
-                    view.onSuccess();
+                    view.showMovie(movie);
                 } else {
                     view.onFailed(response.message());
                 }

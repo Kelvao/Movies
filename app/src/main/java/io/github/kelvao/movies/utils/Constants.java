@@ -3,12 +3,20 @@ package io.github.kelvao.movies.utils;
 public class Constants {
 
     public static final String BASE_URL = Params.BASE_URL;
+    private static final String IMDB_ID = "imdbID";
     private static final String PARAM_ID = Params.ID;
     private static final String PARAM_SEARCH = Params.SEARCH;
     private static final String PARAM_TYPE = Params.TYPE;
     private static final String PARAM_PAGE = Params.PAGE;
     private static final String PARAM_API_KEY = Params.API_KEY;
     private static final String API_KEY = "45d162c8";
+    private static final String QUERY = "query";
+    public static final String MOVIE_LIST_FRAGMENT = "movie_list_fragment";
+    public static final String MOVIE_FRAGMENT = "movie_fragment";
+
+    public static String getImdbId() {
+        return IMDB_ID;
+    }
 
     public static String getParamId() {
         return PARAM_ID;
@@ -32,6 +40,10 @@ public class Constants {
 
     public static String getApiKey() {
         return API_KEY;
+    }
+
+    public static String getQUERY() {
+        return QUERY;
     }
 
     private class Params {
