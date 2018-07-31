@@ -11,8 +11,11 @@ public class Constants {
     private static final String PARAM_API_KEY = Params.API_KEY;
     private static final String API_KEY = "45d162c8";
     private static final String QUERY = "query";
-    public static final String MOVIE_LIST_FRAGMENT = "movie_list_fragment";
     public static final String MOVIE_FRAGMENT = "movie_fragment";
+    private static final String MOVIE_LIST = "MOVIE_LIST";
+    private static final String TOOLBAR = Toolbars.TOOLBAR;
+    private static final String COLLAPSE_TOOLBAR = Toolbars.COLLAPSE_TOOLBAR;
+    private static final String SEARCH_TOOLBAR = Toolbars.SEARCH_TOOBAR;
 
     public static String getImdbId() {
         return IMDB_ID;
@@ -42,8 +45,24 @@ public class Constants {
         return API_KEY;
     }
 
-    public static String getQUERY() {
+    public static String getQuery() {
         return QUERY;
+    }
+
+    public static String getMovieList() {
+        return MOVIE_LIST;
+    }
+
+    public static String getTOOLBAR() {
+        return TOOLBAR;
+    }
+
+    public static String getCollapseToolbar() {
+        return COLLAPSE_TOOLBAR;
+    }
+
+    public static String getSearchToolbar() {
+        return SEARCH_TOOLBAR;
     }
 
     private class Params {
@@ -53,5 +72,11 @@ public class Constants {
         private static final String TYPE = "type";
         private static final String PAGE = "page";
         private static final String API_KEY = "apikey";
+    }
+
+    private class Toolbars {
+        private static final String TOOLBAR = "toolbar";
+        private static final String COLLAPSE_TOOLBAR = "collapse toolbar";
+        private static final String SEARCH_TOOBAR = "search toolbar";
     }
 }

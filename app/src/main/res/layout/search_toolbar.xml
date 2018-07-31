@@ -4,13 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/search_toolbar"
     android:layout_width="match_parent"
-    android:layout_height="?actionBarSize">
-
-    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorTextPrimary"
-        app:titleTextColor="@color/colorPrimary" />
+    android:layout_height="?actionBarSize"
+    android:background="@android:color/white"
+    android:translationZ="999dp"
+    android:clipChildren="false">
 
     <ImageView
         android:id="@+id/iv_back"

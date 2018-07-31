@@ -3,8 +3,9 @@ package io.github.kelvao.movies.models;
 import android.net.Uri;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-class Rating{
+class Rating {
     private String source;
     private String value;
 
@@ -26,85 +27,85 @@ class Rating{
 }
 
 public class MovieModel {
-    private String title;
-    private String released;
-    private String rated;
-    private String genre;
-    private String director;
-    private String writer;
-    private String plot;
-    private String poster;
-    private ArrayList<Rating> ratings;
+    private String Title;
+    private String Released;
+    private String Rated;
+    private String Genre;
+    private String Director;
+    private String Writer;
+    private String Plot;
+    private String Poster;
+    private ArrayList<Rating> Ratings;
 
     public String getTitle() {
-        return title;
+        return Title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        Title = title;
     }
 
     public String getReleased() {
-        return released;
+        return Released;
     }
 
     public void setReleased(String released) {
-        this.released = released;
+        Released = released;
     }
 
     public String getRated() {
-        return rated;
+        return Rated;
     }
 
     public void setRated(String rated) {
-        this.rated = rated;
+        Rated = rated;
     }
 
-    public String getGenre() {
-        return genre;
+    public ArrayList<String> getGenre() {
+        return new ArrayList<>(Arrays.asList(Genre.replace(" ", "").split(",")));
     }
 
     public void setGenre(String genre) {
-        this.genre = genre;
+        Genre = genre;
     }
 
     public String getDirector() {
-        return director;
+        return Director;
     }
 
     public void setDirector(String director) {
-        this.director = director;
+        Director = director;
     }
 
     public String getWriter() {
-        return writer;
+        return Writer;
     }
 
     public void setWriter(String writer) {
-        this.writer = writer;
+        Writer = writer;
     }
 
     public String getPlot() {
-        return plot;
+        return Plot;
     }
 
     public void setPlot(String plot) {
-        this.plot = plot;
+        Plot = plot;
     }
 
     public Uri getPoster() {
-        return Uri.parse(poster);
+        return Uri.parse(Poster.replace("SX300", "SX600"));
     }
 
     public void setPoster(String poster) {
-        this.poster = poster;
+        Poster = poster;
     }
 
     public ArrayList<Rating> getRatings() {
-        return ratings;
+        return Ratings;
     }
 
     public void setRatings(ArrayList<Rating> ratings) {
-        this.ratings = ratings;
+        Ratings = ratings;
     }
 }

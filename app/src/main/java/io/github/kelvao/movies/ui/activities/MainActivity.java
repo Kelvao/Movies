@@ -4,13 +4,15 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +22,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.orhanobut.hawk.Hawk;
 
 import java.util.Objects;
 
@@ -30,20 +34,30 @@ import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import io.github.kelvao.movies.R;
 import io.github.kelvao.movies.ui.fragments.MovieListFragment;
+import io.github.kelvao.movies.ui.utils.GlideApp;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
-    @BindView(R.id.search_toolbar)
-    ConstraintLayout search_toolbar;
-    @BindView(R.id.et_query)
-    EditText et_query;
-    @BindView(R.id.iv_back)
-    ImageView iv_back;
-    @BindView(R.id.iv_clear)
-    ImageView iv_clear;
+    @BindView(R.id.abl_toolbar)
+    AppBarLayout abl_toolbar;
+    @BindView(R.id.ctl_toolbar)
+    CollapsingToolbarLayout ctl_toolbar;
+    @BindView(R.id.iv_poster)
+    ImageView iv_poster;
+    @BindView(R.id.v_shadow)
+    View v_shadow;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.search_toolbar)
+    ConstraintLayout search_toolbar;
+    @BindView(R.id.iv_back)
+    ImageView iv_back;
+    @BindView(R.id.et_query)
+    EditText et_query;
+    @BindView(R.id.iv_clear)
+    ImageView iv_clear;
     private MovieListFragment movieListFragment;
+    private boolean showMenu = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +69,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         movieListFragment = MovieListFragment.newInstance(null);
         initFragment();
         initSearchToolbar();
+        initHawk();
+    }
+
+    private void initHawk() {
+        Hawk.init(this).build();
     }
 
     private void initFragment() {
@@ -104,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         } else {
             anim = ViewAnimationUtils.createCircularReveal(search_toolbar, cx, cy, (float) width, 0);
             hideSoftKeyboard();
+            et_query.clearFocus();
         }
         anim.setDuration((long) 220);
         // make the view invisible when the animation is done
@@ -113,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 if (!isShow) {
                     super.onAnimationEnd(animation);
                     search_toolbar.setVisibility(View.INVISIBLE);
+                    search_toolbar.bringToFront();
+                    search_toolbar.invalidate();
                 }
             }
         });
@@ -127,7 +149,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (showMenu) {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -184,13 +208,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @Override
     public void onBackStackChanged() {
-        Log.i("TESTE", "onBackStackChanged: " + getSupportFragmentManager().getBackStackEntryCount());
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             if (search_toolbar.getVisibility() == View.VISIBLE) {
                 circleReveal(false);
             }
+            abl_toolbar.setExpanded(true, true);
+            showMenu = false;
+            invalidateOptionsMenu();
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         } else {
+            abl_toolbar.setExpanded(false, true);
+            showMenu = true;
+            invalidateOptionsMenu();
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         }
     }
@@ -200,6 +229,27 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager().beginTransaction()
                 .show(movieListFragment)
                 .commit();
+        ctl_toolbar.setTitle(getText(R.string.app_name));
+    }
+
+    @Override
+    protected void onPause() {
+        if (search_toolbar.getVisibility() == View.VISIBLE) {
+            circleReveal(false);
+        }
+        super.onPause();
+    }
+
+    public void setCollapseInfo(String title, Uri imageUrl) {
+        imageUrl = Uri.parse(String.valueOf(imageUrl).replace("SX300", "SX500"));
+        GlideApp.with(this)
+                .load(imageUrl)
+                .centerCrop()
+                .error(getDrawable(R.drawable.ic_broken_image))
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(iv_poster);
+        ctl_toolbar.setTitle(title);
+        v_shadow.setBackground(getDrawable(R.drawable.collapsed_image_background));
     }
 
 }

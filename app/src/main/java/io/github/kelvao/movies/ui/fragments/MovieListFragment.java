@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,8 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import io.github.kelvao.movies.models.MovieListModel;
 import io.github.kelvao.movies.presenters.MovieListPresenter;
 import io.github.kelvao.movies.tasks.MovieList;
 import io.github.kelvao.movies.tasks.OnLoadMoreListener;
+import io.github.kelvao.movies.ui.activities.MainActivity;
 import io.github.kelvao.movies.ui.adapters.MovieAdapter;
 import io.github.kelvao.movies.utils.Constants;
 
@@ -48,7 +50,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
 
     public static MovieListFragment newInstance(String query) {
         Bundle args = new Bundle();
-        args.putString(Constants.getQUERY(), query);
+        args.putString(Constants.getQuery(), query);
         MovieListFragment fragment = new MovieListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -62,12 +64,18 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         movieList = new ArrayList<>();
         presenter = new MovieListPresenter(this);
         initRecyclerView();
-        if (getArguments() != null && !"".equals(getArguments().getString(Constants.getQUERY()))) {
-            queryMovies(getArguments().getString(Constants.getQUERY()));
-        } else {
-            updateUi(false);
+        initHawk();
+        if (getArguments() != null) {
+            queryMovies(getArguments().getString(Constants.getQuery()));
         }
         return fragment_movie_list;
+    }
+
+    private void initHawk() {
+        Hawk.init(Objects.requireNonNull(getContext())).build();
+        if (!Hawk.contains(Constants.getMovieList())) {
+            Hawk.put(Constants.getMovieList(), movieList);
+        }
     }
 
     private void queryMovies(String title) {
@@ -95,6 +103,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         if (movieList != null) {
             this.movieList.remove(null);
             this.movieList.addAll(movieList);
+            Hawk.put(Constants.getMovieList(), movieList);
             adapter.notifyDataSetChanged();
         }
         updateUi(false);
@@ -112,6 +121,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
                 .addToBackStack(Constants.MOVIE_FRAGMENT)
                 .hide(this)
                 .commit();
+        ((MainActivity) getActivity()).setCollapseInfo(movie.getTitle(), movie.getPoster());
     }
 
     @Override
@@ -126,7 +136,6 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
 
     private void clearMovieList() {
         rv_movies.getLayoutManager().scrollToPosition(0);
-        Log.i("TESTE", "queryMovies: ");
         int size = movieList.size();
         movieList.clear();
         adapter.notifyItemRangeRemoved(0, size);
@@ -160,5 +169,4 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         textView.setTextColor(Color.RED);
         snackbar.show();
     }
-
 }

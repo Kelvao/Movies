@@ -2,6 +2,8 @@ package io.github.kelvao.movies.presenters;
 
 import android.support.annotation.NonNull;
 
+import com.orhanobut.hawk.Hawk;
+
 import java.util.HashMap;
 
 import io.github.kelvao.movies.api.MoviesApiService;
@@ -37,33 +39,38 @@ public class MovieListPresenter implements MovieList.Presenter {
     public void getMoviesList(String title) {
         initPagination(title);
         initParams();
-        Call<MovieListModel> call = moviesApiService.getMovieList(params);
-        call.enqueue(new Callback<MovieListModel>() {
-            @Override
-            public void onResponse(@NonNull Call<MovieListModel> call, @NonNull Response<MovieListModel> response) {
-                MovieListModel movieList = response.body();
-                if (response.isSuccessful() && movieList != null) {
-                    numPages = movieList.getTotalResults() / 10;
-                    if (movieList.getTotalResults() % 10 != 0) {
-                        numPages++;
+        if (Hawk.contains(Constants.getMovieList())) {
+            setPagination(Hawk.get(Constants.getMovieList()));
+            returnMovieList(Hawk.get(Constants.getMovieList()));
+        } else {
+            Call<MovieListModel> call = moviesApiService.getMovieList(params);
+            call.enqueue(new Callback<MovieListModel>() {
+                @Override
+                public void onResponse(@NonNull Call<MovieListModel> call, @NonNull Response<MovieListModel> response) {
+                    MovieListModel movieList = response.body();
+                    if (response.isSuccessful() && movieList != null) {
+                        setPagination(movieList);
+                        if (page < numPages) {
+                            movieList.getMovies().add(null);
+                        }
+                        returnMovieList(movieList);
+                        view.onSuccess();
+                    } else {
+                        view.onFailed(response.message());
                     }
-                    page++;
-                    if (page < numPages) {
-                        movieList.getMovies().add(null);
-                    }
-                    view.setMovieList(movieList.getMovies());
-                    view.runLayoutAnimation();
-                    view.onSuccess();
-                } else {
-                    view.onFailed(response.message());
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<MovieListModel> call, @NonNull Throwable t) {
-                view.onFailed(t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<MovieListModel> call, @NonNull Throwable t) {
+                    view.onFailed(t.getMessage());
+                }
+            });
+        }
+    }
+
+    private void returnMovieList(MovieListModel movieList) {
+        view.setMovieList(movieList.getMovies());
+        view.runLayoutAnimation();
     }
 
     @Override
@@ -107,4 +114,13 @@ public class MovieListPresenter implements MovieList.Presenter {
         numPages = 2;
         query = title;
     }
+
+    private void setPagination(MovieListModel movieList) {
+        numPages = movieList.getTotalResults() / 10;
+        if (movieList.getTotalResults() % 10 != 0) {
+            numPages++;
+        }
+        page++;
+    }
+
 }
