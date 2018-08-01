@@ -2,8 +2,6 @@ package io.github.kelvao.movies.presenters;
 
 import android.support.annotation.NonNull;
 
-import com.orhanobut.hawk.Hawk;
-
 import java.util.HashMap;
 
 import io.github.kelvao.movies.api.MoviesApiService;
@@ -24,6 +22,7 @@ public class MovieListPresenter implements MovieList.Presenter {
     private int numPages = 2;
     private String query = "";
     private HashMap<String, String> params;
+    private MovieListModel movieList;
 
     public MovieListPresenter(MovieList.View view) {
         this.view = view;
@@ -39,38 +38,32 @@ public class MovieListPresenter implements MovieList.Presenter {
     public void getMoviesList(String title) {
         initPagination(title);
         initParams();
-        if (Hawk.contains(Constants.getMovieList())) {
-            setPagination(Hawk.get(Constants.getMovieList()));
-            returnMovieList(Hawk.get(Constants.getMovieList()));
-        } else {
-            Call<MovieListModel> call = moviesApiService.getMovieList(params);
-            call.enqueue(new Callback<MovieListModel>() {
-                @Override
-                public void onResponse(@NonNull Call<MovieListModel> call, @NonNull Response<MovieListModel> response) {
-                    MovieListModel movieList = response.body();
-                    if (response.isSuccessful() && movieList != null) {
-                        setPagination(movieList);
-                        if (page < numPages) {
-                            movieList.getMovies().add(null);
-                        }
-                        returnMovieList(movieList);
-                        view.onSuccess();
-                    } else {
-                        view.onFailed(response.message());
+        Call<MovieListModel> call = moviesApiService.getMovieList(params);
+        call.enqueue(new Callback<MovieListModel>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieListModel> call, @NonNull Response<MovieListModel> response) {
+                movieList = response.body();
+                if (response.isSuccessful() && movieList != null) {
+                    setPagination(movieList);
+                    if (page < numPages) {
+                        movieList.getMovies().add(null);
                     }
+                    view.setMovieList(movieList.getMovies());
+                    view.runLayoutAnimation();
+                    page++;
+                    if(!"".equals(title)) {
+                        view.onSuccess();
+                    }
+                } else {
+                    view.onFailed(response.message());
                 }
+            }
 
-                @Override
-                public void onFailure(@NonNull Call<MovieListModel> call, @NonNull Throwable t) {
-                    view.onFailed(t.getMessage());
-                }
-            });
-        }
-    }
-
-    private void returnMovieList(MovieListModel movieList) {
-        view.setMovieList(movieList.getMovies());
-        view.runLayoutAnimation();
+            @Override
+            public void onFailure(@NonNull Call<MovieListModel> call, @NonNull Throwable t) {
+                view.onFailed(t.getMessage());
+            }
+        });
     }
 
     @Override
@@ -81,7 +74,7 @@ public class MovieListPresenter implements MovieList.Presenter {
             call.enqueue(new Callback<MovieListModel>() {
                 @Override
                 public void onResponse(@NonNull Call<MovieListModel> call, @NonNull Response<MovieListModel> response) {
-                    MovieListModel movieList = response.body();
+                    movieList = response.body();
                     if (response.isSuccessful() && movieList != null) {
                         page++;
                         if (page < numPages) {
@@ -120,7 +113,6 @@ public class MovieListPresenter implements MovieList.Presenter {
         if (movieList.getTotalResults() % 10 != 0) {
             numPages++;
         }
-        page++;
     }
 
 }

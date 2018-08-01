@@ -10,7 +10,10 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.Menu;
@@ -25,18 +28,20 @@ import android.widget.ImageView;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
-import com.orhanobut.hawk.Hawk;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import io.github.kelvao.movies.R;
+import io.github.kelvao.movies.tasks.Animation;
+import io.github.kelvao.movies.ui.adapters.SuggestionsAdapter;
 import io.github.kelvao.movies.ui.fragments.MovieListFragment;
 import io.github.kelvao.movies.ui.utils.GlideApp;
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, SuggestionsAdapter.Callback {
 
     @BindView(R.id.abl_toolbar)
     AppBarLayout abl_toolbar;
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     Toolbar toolbar;
     @BindView(R.id.search_toolbar)
     ConstraintLayout search_toolbar;
+    @BindView(R.id.rv_suggestions)
+    RecyclerView rv_suggestion;
     @BindView(R.id.iv_back)
     ImageView iv_back;
     @BindView(R.id.et_query)
@@ -58,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     ImageView iv_clear;
     private MovieListFragment movieListFragment;
     private boolean showMenu = true;
+    private SuggestionsAdapter adapter;
+    private ArrayList<String> suggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +75,27 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
-        movieListFragment = MovieListFragment.newInstance(null);
         initFragment();
         initSearchToolbar();
-        initHawk();
+        suggestions = new ArrayList<>();
+        initRecyclerView();
     }
 
-    private void initHawk() {
-        Hawk.init(this).build();
+    private void initRecyclerView() {
+        rv_suggestion.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv_suggestion.setLayoutManager(linearLayoutManager);
+        adapter = new SuggestionsAdapter(suggestions, this);
+        rv_suggestion.setAdapter(adapter);
     }
 
     private void initFragment() {
+        movieListFragment = MovieListFragment.newInstance(et_query.getText().toString());
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.cfl_container, MovieListFragment.newInstance(et_query.getText().toString()))
+                .replace(R.id.cfl_container, movieListFragment)
                 .commit();
+        v_shadow.setBackground(null);
     }
 
 
@@ -90,7 +106,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 if (!"".equals(et_query.getText().toString())) {
                     initFragment();
-                    hideSoftKeyboard();
+                    if(!suggestions.contains(et_query.getText().toString().toLowerCase())) {
+                        suggestions.add(et_query.getText().toString());
+                    }
+                    circleReveal(false);
                     return true;
                 }
                 return false;
@@ -106,10 +125,41 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         } else {
             iv_clear.setVisibility(View.VISIBLE);
         }
+        final ArrayList<String> filteredList = filter(suggestions, editable.toString());
+        adapter.setfilter(filteredList);
+    }
+
+    private ArrayList<String> filter(ArrayList<String> suggestions, String query) {
+        query = query.toLowerCase();
+        final ArrayList<String> filteredModeList = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.startsWith(query)) {
+                filteredModeList.add(suggestion);
+            }
+        }
+        return filteredModeList;
+    }
+
+    private void circleReveal(boolean isShow) {
+        if (isShow) {
+            toolbarCircleReveal(true, () -> {
+                if (suggestions.size() > 0) {
+                    suggestionsCircleReveal(true, null);
+                    final ArrayList<String> filteredList = filter(suggestions, et_query.getText().toString());
+                    adapter.setfilter(filteredList);
+                }
+            });
+        } else {
+            if(suggestions.size() > 0) {
+                suggestionsCircleReveal(false, () -> toolbarCircleReveal(false, null));
+            } else {
+                toolbarCircleReveal(false, null);
+            }
+        }
     }
 
     @SuppressLint("PrivateResource")
-    public void circleReveal(final boolean isShow) {
+    public void toolbarCircleReveal(final boolean isShow, Animation animationCallback) {
         int width = search_toolbar.getWidth();
         width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 4);
         width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
@@ -126,26 +176,52 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             et_query.clearFocus();
         }
         anim.setDuration((long) 220);
-        // make the view invisible when the animation is done
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (!isShow) {
                     super.onAnimationEnd(animation);
                     search_toolbar.setVisibility(View.INVISIBLE);
-                    search_toolbar.bringToFront();
-                    search_toolbar.invalidate();
+                }
+                if (animationCallback != null) {
+                    animationCallback.animationEnded();
                 }
             }
         });
-        // make the view visible and start the animation
         if (isShow) {
             search_toolbar.setVisibility(View.VISIBLE);
         }
-        // start the animation
         anim.start();
     }
 
+    private void suggestionsCircleReveal(boolean isShow, Animation animationCallback) {
+        int finalRadius = rv_suggestion.getHeight();
+        int cy = 0;
+        int cx = rv_suggestion.getWidth() / 2;
+        Animator anim;
+        if (isShow) {
+            anim = ViewAnimationUtils.createCircularReveal(rv_suggestion, cx, cy, 0, finalRadius);
+        } else {
+            anim = ViewAnimationUtils.createCircularReveal(rv_suggestion, cx, cy, finalRadius, 0);
+        }
+        anim.setDuration((long) 220);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!isShow) {
+                    super.onAnimationEnd(animation);
+                    rv_suggestion.setVisibility(View.INVISIBLE);
+                }
+                if (animationCallback != null) {
+                    animationCallback.animationEnded();
+                }
+            }
+        });
+        if (isShow) {
+            rv_suggestion.setVisibility(View.VISIBLE);
+        }
+        anim.start();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -199,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             popFragment();
         } else {
             if (search_toolbar.getVisibility() == View.VISIBLE) {
-                circleReveal(false);
+                circleReveal(true);
             } else {
                 super.onBackPressed();
             }
@@ -252,4 +328,26 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         v_shadow.setBackground(getDrawable(R.drawable.collapsed_image_background));
     }
 
+    @Override
+    public void onSuggestionClick(String suggestion) {
+        et_query.setText(suggestion);
+        initFragment();
+        circleReveal(false);
+    }
+
+    @Override
+    public void onSuggestionDelete(String suggestion) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(suggestion);
+        builder.setMessage(getText(R.string.delete_suggestion));
+        builder.setPositiveButton(getText(R.string.delete), (dialogInterface, i) -> {
+            suggestions.remove(suggestion);
+            adapter.notifyDataSetChanged();
+            if(suggestions.size() == 0){
+                suggestionsCircleReveal(false, null);
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.show();
+    }
 }

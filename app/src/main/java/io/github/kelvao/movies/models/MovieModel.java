@@ -62,7 +62,7 @@ public class MovieModel {
     }
 
     public ArrayList<String> getGenre() {
-        return new ArrayList<>(Arrays.asList(Genre.replace(" ", "").split(",")));
+        return new ArrayList<>(Arrays.asList(Genre.replace(" ", "").toUpperCase().split(",")));
     }
 
     public void setGenre(String genre) {

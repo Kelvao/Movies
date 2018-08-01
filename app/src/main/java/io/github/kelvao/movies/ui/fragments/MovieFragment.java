@@ -23,7 +23,6 @@ import io.github.kelvao.movies.R;
 import io.github.kelvao.movies.models.MovieModel;
 import io.github.kelvao.movies.presenters.MoviePresenter;
 import io.github.kelvao.movies.tasks.Movie;
-import io.github.kelvao.movies.ui.activities.MainActivity;
 import io.github.kelvao.movies.ui.adapters.GenreAdapter;
 import io.github.kelvao.movies.utils.Constants;
 
@@ -33,6 +32,10 @@ public class MovieFragment extends Fragment implements Movie.View {
     TextView tv_released;
     @BindView(R.id.tv_director)
     TextView tv_director;
+    @BindView(R.id.tv_writer)
+    TextView tv_writer;
+    @BindView(R.id.tv_rated)
+    TextView tv_rated;
     @BindView(R.id.tv_plot)
     TextView tv_plot;
     @BindView(R.id.rv_genre)
@@ -60,10 +63,10 @@ public class MovieFragment extends Fragment implements Movie.View {
 
     @Override
     public void showMovie(MovieModel movie) {
-       // ((MainActivity) Objects.requireNonNull(getActivity()))
-         //       .setCollapseInfo(movie.getTitle(), movie.getPoster());
         tv_released.setText(String.format("%s: %s", getText(R.string.year), movie.getReleased()));
         tv_director.setText(String.format("%s: %s", getText(R.string.director), movie.getDirector()));
+        tv_writer.setText(String.format("%s: %s", getText(R.string.writer), movie.getWriter()));
+        tv_rated.setText(movie.getRated());
         tv_plot.setText(movie.getPlot());
         genres.addAll(movie.getGenre());
         initRecyclerView();

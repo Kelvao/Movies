@@ -13,6 +13,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <android.support.v7.widget.RecyclerView
+        android:translationZ="9dp"
+        android:id="@+id/rv_suggestions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?actionBarSize"
+        android:background="@android:color/white"
+        android:visibility="invisible" />
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/abl_toolbar"
         android:layout_width="match_parent"
@@ -23,7 +32,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/search_toolbar"
-        android:visibility="invisible"/>
+    <include
+        layout="@layout/search_toolbar"
+        android:visibility="invisible" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -55,6 +55,7 @@ public class MoviePresenter implements Movie.Presenter {
     private void initParams(String imdbID) {
         params = new HashMap<>();
         params.put(Constants.getParamId(), imdbID);
+        params.put(Constants.getParamPlot(), "full");
         params.put(Constants.getParamApiKey(), Constants.getApiKey());
     }
 }

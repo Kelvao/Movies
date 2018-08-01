@@ -7,15 +7,13 @@ public class Constants {
     private static final String PARAM_ID = Params.ID;
     private static final String PARAM_SEARCH = Params.SEARCH;
     private static final String PARAM_TYPE = Params.TYPE;
+    private static final String PARAM_PLOT = Params.PLOT;
     private static final String PARAM_PAGE = Params.PAGE;
     private static final String PARAM_API_KEY = Params.API_KEY;
     private static final String API_KEY = "45d162c8";
     private static final String QUERY = "query";
     public static final String MOVIE_FRAGMENT = "movie_fragment";
-    private static final String MOVIE_LIST = "MOVIE_LIST";
-    private static final String TOOLBAR = Toolbars.TOOLBAR;
-    private static final String COLLAPSE_TOOLBAR = Toolbars.COLLAPSE_TOOLBAR;
-    private static final String SEARCH_TOOLBAR = Toolbars.SEARCH_TOOBAR;
+    private static final String SUGGESTIONS = "suggestions";
 
     public static String getImdbId() {
         return IMDB_ID;
@@ -31,6 +29,10 @@ public class Constants {
 
     public static String getParamType() {
         return PARAM_TYPE;
+    }
+
+    public static String getParamPlot() {
+        return PARAM_PLOT;
     }
 
     public static String getParamPage() {
@@ -49,20 +51,8 @@ public class Constants {
         return QUERY;
     }
 
-    public static String getMovieList() {
-        return MOVIE_LIST;
-    }
-
-    public static String getTOOLBAR() {
-        return TOOLBAR;
-    }
-
-    public static String getCollapseToolbar() {
-        return COLLAPSE_TOOLBAR;
-    }
-
-    public static String getSearchToolbar() {
-        return SEARCH_TOOLBAR;
+    public static String getSuggestions() {
+        return SUGGESTIONS;
     }
 
     private class Params {
@@ -70,6 +60,7 @@ public class Constants {
         private static final String ID = "i";
         private static final String SEARCH = "s";
         private static final String TYPE = "type";
+        private static final String PLOT = "plot";
         private static final String PAGE = "page";
         private static final String API_KEY = "apikey";
     }

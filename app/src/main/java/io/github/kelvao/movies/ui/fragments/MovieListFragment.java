@@ -18,8 +18,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.orhanobut.hawk.Hawk;
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -64,18 +62,10 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         movieList = new ArrayList<>();
         presenter = new MovieListPresenter(this);
         initRecyclerView();
-        initHawk();
         if (getArguments() != null) {
             queryMovies(getArguments().getString(Constants.getQuery()));
         }
         return fragment_movie_list;
-    }
-
-    private void initHawk() {
-        Hawk.init(Objects.requireNonNull(getContext())).build();
-        if (!Hawk.contains(Constants.getMovieList())) {
-            Hawk.put(Constants.getMovieList(), movieList);
-        }
     }
 
     private void queryMovies(String title) {
@@ -103,7 +93,6 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         if (movieList != null) {
             this.movieList.remove(null);
             this.movieList.addAll(movieList);
-            Hawk.put(Constants.getMovieList(), movieList);
             adapter.notifyDataSetChanged();
         }
         updateUi(false);
@@ -151,22 +140,26 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
 
     @Override
     public void onSuccess() {
-        Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_movies), getText(R.string.search_success), Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        sbView.setBackgroundColor(Color.WHITE);
-        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.BLACK);
-        snackbar.show();
+        if (getView() != null) {
+            Snackbar snackbar = Snackbar.make(getView(), getText(R.string.search_success), Snackbar.LENGTH_LONG);
+            View sbView = snackbar.getView();
+            sbView.setBackgroundColor(Color.WHITE);
+            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(Color.BLACK);
+            snackbar.show();
+        }
     }
 
     @Override
     public void onFailed(String message) {
         updateUi(false);
-        Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_movies), message, Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        sbView.setBackgroundColor(Color.WHITE);
-        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.RED);
-        snackbar.show();
+        if (getView() != null) {
+            Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getView()), message, Snackbar.LENGTH_LONG);
+            View sbView = snackbar.getView();
+            sbView.setBackgroundColor(Color.WHITE);
+            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(Color.RED);
+            snackbar.show();
+        }
     }
 }

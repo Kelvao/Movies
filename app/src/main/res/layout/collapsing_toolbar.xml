@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     app:contentScrim="?attr/colorPrimary"
     app:expandedTitleMarginBottom="30dp"
+    app:expandedTitleTextAppearance="@style/TextAppearance.Movies.Title.Expanded"
     app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
     <ImageView
@@ -20,7 +21,6 @@
 
     <View
         android:id="@+id/v_shadow"
-        android:background="@drawable/collapsed_image_background"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_gravity="bottom"/>

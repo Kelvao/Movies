@@ -8,9 +8,10 @@
     tools:context=".ui.fragments.MovieFragment">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/cl_movie"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:layout_margin="16dp">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/cl_first_info"
@@ -35,20 +36,45 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@id/tv_rated"
+                app:layout_constraintBottom_toTopOf="@id/tv_writer"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_released" />
 
             <TextView
-                android:id="@+id/tv_rated"
+                android:id="@+id/tv_writer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_red_dark"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_hint_rated"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_director" />
+
+            <TextView
+                android:id="@+id/tv_hint_rated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/hint_rated"
+                android:textColor="@android:color/holo_red_dark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_rated"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_writer" />
+
+            <TextView
+                android:id="@+id/tv_rated"
+                android:layout_width="50dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rated_item_background"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                app:layout_constraintBottom_toBottomOf="@id/tv_hint_rated"
+                app:layout_constraintStart_toEndOf="@id/tv_hint_rated"
+                app:layout_constraintTop_toBottomOf="@id/tv_director"
+                app:layout_constraintTop_toTopOf="@id/tv_hint_rated" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -56,45 +82,30 @@
             android:id="@+id/tv_plot"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
             android:textAlignment="inherit"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/cl_genre"
+            app:layout_constraintBottom_toTopOf="@id/rv_genre"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cl_first_info" />
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_genre"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_genre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@id/rv_ratings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_plot">
+            app:layout_constraintTop_toBottomOf="@id/tv_plot" />
 
-            <TextView
-                android:id="@+id/tv_hint_genre"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/hint_genre"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/rv_genre"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_genre"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_hint_genre" />
-
-        </android.support.constraint.ConstraintLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_ratings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_genre" />
 
     </android.support.constraint.ConstraintLayout>
 
