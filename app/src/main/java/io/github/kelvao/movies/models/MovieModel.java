@@ -5,27 +5,6 @@ import android.net.Uri;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class Rating {
-    private String source;
-    private String value;
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-}
-
 public class MovieModel {
     private String Title;
     private String Released;
@@ -107,5 +86,26 @@ public class MovieModel {
 
     public void setRatings(ArrayList<Rating> ratings) {
         Ratings = ratings;
+    }
+
+   public class Rating {
+        private String Source;
+        private String Value;
+
+        public String getSource() {
+            return Source;
+        }
+
+        public void setSource(String source) {
+            this.Source = source;
+        }
+
+        public String getValue() {
+            return Value;
+        }
+
+        public void setValue(String value) {
+            this.Value = value;
+        }
     }
 }

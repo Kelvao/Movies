@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 if (!"".equals(et_query.getText().toString())) {
                     initFragment();
-                    if(!suggestions.contains(et_query.getText().toString().toLowerCase())) {
+                    if (!suggestions.contains(et_query.getText().toString().toLowerCase())) {
                         suggestions.add(et_query.getText().toString());
                     }
                     circleReveal(false);
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 }
             });
         } else {
-            if(suggestions.size() > 0) {
+            if (suggestions.size() > 0) {
                 suggestionsCircleReveal(false, () -> toolbarCircleReveal(false, null));
             } else {
                 toolbarCircleReveal(false, null);
@@ -241,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 circleReveal(true);
                 return true;
             case R.id.action_about:
-                new LibsBuilder()
+                Intent intent = new LibsBuilder()
                         .withAboutIconShown(true)
                         .withAboutAppName(getResources().getString(R.string.app_name))
                         .withActivityTitle(getResources().getString(R.string.about))
@@ -250,7 +251,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         .withVersionShown(true)
                         .withAutoDetect(true)
                         .withActivityStyle(Libs.ActivityStyle.DARK)
-                        .start(this);
+                        .withLibraries("DesertIcon")
+                        .intent(this);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -343,11 +347,17 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         builder.setPositiveButton(getText(R.string.delete), (dialogInterface, i) -> {
             suggestions.remove(suggestion);
             adapter.notifyDataSetChanged();
-            if(suggestions.size() == 0){
+            if (suggestions.size() == 0) {
                 suggestionsCircleReveal(false, null);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss());
         builder.show();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, android.R.anim.fade_out);
     }
 }
