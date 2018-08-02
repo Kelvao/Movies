@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     private void initFragment() {
         movieListFragment = MovieListFragment.newInstance(et_query.getText().toString());
         getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_right)
                 .replace(R.id.cfl_container, movieListFragment)
                 .commit();
         v_shadow.setBackground(null);

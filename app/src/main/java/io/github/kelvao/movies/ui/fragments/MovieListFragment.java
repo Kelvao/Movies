@@ -108,6 +108,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction()
                 .add(R.id.cfl_container, MovieFragment.newInstance(movie.getImdbID()))
                 .addToBackStack(Constants.MOVIE_FRAGMENT)
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_left)
                 .hide(this)
                 .commit();
         ((MainActivity) getActivity()).setCollapseInfo(movie.getTitle(), movie.getPoster());
@@ -140,8 +141,8 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
 
     @Override
     public void onSuccess() {
-        if (getView() != null) {
-            Snackbar snackbar = Snackbar.make(getView(), getText(R.string.search_success), Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), getText(R.string.search_success), Snackbar.LENGTH_LONG);
             View sbView = snackbar.getView();
             sbView.setBackgroundColor(Color.WHITE);
             TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
@@ -153,8 +154,8 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
     @Override
     public void onFailed(String message) {
         updateUi(false);
-        if (getView() != null) {
-            Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getView()), message, Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), message, Snackbar.LENGTH_LONG);
             View sbView = snackbar.getView();
             sbView.setBackgroundColor(Color.WHITE);
             TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);

@@ -1,13 +1,17 @@
 package io.github.kelvao.movies.ui.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexDirection;
@@ -44,6 +48,10 @@ public class MovieFragment extends Fragment implements Movie.View {
     RecyclerView rv_genre;
     @BindView(R.id.rv_ratings)
     RecyclerView rv_ratings;
+    @BindView(R.id.sv_movie)
+    ScrollView sv_movie;
+    @BindView(R.id.pg_movie)
+    ProgressBar pg_movie;
     private ArrayList<String> genres;
     private ArrayList<MovieModel.Rating> ratings;
 
@@ -78,6 +86,7 @@ public class MovieFragment extends Fragment implements Movie.View {
         ratings.addAll(movie.getRatings());
         initGenresRecyclerView();
         initRatingRecyclerView();
+        updateUi(false);
     }
 
     public void initGenresRecyclerView() {
@@ -102,6 +111,18 @@ public class MovieFragment extends Fragment implements Movie.View {
 
     @Override
     public void onFailed(String message) {
+        if (getActivity() != null) {
+            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), message, Snackbar.LENGTH_LONG);
+            View sbView = snackbar.getView();
+            sbView.setBackgroundColor(Color.WHITE);
+            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(Color.RED);
+            snackbar.show();
+        }
+    }
 
+    public void updateUi(boolean isLoading){
+        pg_movie.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        sv_movie.setVisibility(isLoading ? View.GONE : View.VISIBLE);
     }
 }

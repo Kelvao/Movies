@@ -14,7 +14,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
-        android:background="@android:color/white"
+        android:background="@drawable/broken_image_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tv_name_year"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,11 +28,9 @@
         android:layout_marginStart="16dp"
         android:maxEms="10"
         android:maxLines="3"
-        android:text="Hardcoded (2018)"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_poster"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
