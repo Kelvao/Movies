@@ -30,7 +30,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat" />
 
-    <style name="AppTheme.NoActionBar.SplashTheme">
+    <style name="SplashTheme" parent="AppTheme.NoActionBar">
         <item name="android:windowAnimationStyle">@style/SplashActivityAnimation</item>
     </style>
 

@@ -19,6 +19,7 @@ public class SplashActivity extends AppCompatActivity {
     private Runnable waitCallbackMain = () -> {
         startActivity(new Intent(SplashActivity.this, MainActivity.class));
         finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     };
 
     @Override

@@ -13,7 +13,9 @@ public class Constants {
     private static final String API_KEY = "45d162c8";
     private static final String QUERY = "query";
     public static final String MOVIE_FRAGMENT = "movie_fragment";
-    private static final String SUGGESTIONS = "suggestions";
+    private static final String IMAGE_OLD_SIZE = Image.OLD_SIZE;
+    private static final String IMAGE_NEW_SIZE = Image.NEW_SIZE;
+    private static final String FIRST_RUN = "fistrun";
 
     public static String getImdbId() {
         return IMDB_ID;
@@ -51,8 +53,16 @@ public class Constants {
         return QUERY;
     }
 
-    public static String getSuggestions() {
-        return SUGGESTIONS;
+    public static String getImageOldSize() {
+        return IMAGE_OLD_SIZE;
+    }
+
+    public static String getImageNewSize() {
+        return IMAGE_NEW_SIZE;
+    }
+
+    public static String getFirstRun() {
+        return FIRST_RUN;
     }
 
     private class Params {
@@ -65,9 +75,8 @@ public class Constants {
         private static final String API_KEY = "apikey";
     }
 
-    private class Toolbars {
-        private static final String TOOLBAR = "toolbar";
-        private static final String COLLAPSE_TOOLBAR = "collapse toolbar";
-        private static final String SEARCH_TOOBAR = "search toolbar";
+    private class Image {
+        private static final String OLD_SIZE = "SX300";
+        private static final String NEW_SIZE = "SX600";
     }
 }

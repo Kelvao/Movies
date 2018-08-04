@@ -43,9 +43,16 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         return suggestions == null ? 0 : suggestions.size();
     }
 
-    public void setfilter(ArrayList<String> suggestions){
+    public void filter(ArrayList<String> suggestions, String query) {
+        query = query.toLowerCase();
+        final ArrayList<String> filteredModeList = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.startsWith(query)) {
+                filteredModeList.add(suggestion);
+            }
+        }
         this.suggestions = new ArrayList<>();
-        this.suggestions.addAll(suggestions);
+        this.suggestions.addAll(filteredModeList);
         notifyDataSetChanged();
     }
 

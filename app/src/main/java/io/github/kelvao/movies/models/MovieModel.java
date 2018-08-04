@@ -5,6 +5,8 @@ import android.net.Uri;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import io.github.kelvao.movies.utils.Constants;
+
 public class MovieModel {
     private String Title;
     private String Released;
@@ -73,7 +75,7 @@ public class MovieModel {
     }
 
     public Uri getPoster() {
-        return Uri.parse(Poster.replace("SX300", "SX600"));
+        return Uri.parse(Poster.replace(Constants.getImageOldSize(), Constants.getImageNewSize()));
     }
 
     public void setPoster(String poster) {

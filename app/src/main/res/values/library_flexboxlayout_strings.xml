@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-	<string name="define_int_flexboxlayout">year;owner</string>
+	<string name="define_int_flexboxlayout"></string>
 	<!-- Author section -->
 	<string name="library_flexboxlayout_author">Google</string>
 	<string name="library_flexboxlayout_authorWebsite">https://google.com/</string>

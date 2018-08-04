@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+	<string name="define_int_taptargetview"></string>
+	<!-- Author section -->
+	<string name="library_taptargetview_author">Keepsafe</string>
+	<string name="library_taptargetview_authorWebsite">https://medium.com/keepsafe-engineering</string>
+	<!-- Library section -->
+	<string name="library_taptargetview_libraryName">TapTargetView</string>
+	<string name="library_taptargetview_libraryDescription"> An implementation of tap targets from the Material Design guidelines for feature discovery</string>
+	<string name="library_taptargetview_libraryWebsite">https://github.com/KeepSafe/TapTargetView</string>
+	<string name="library_taptargetview_libraryVersion">1.12.0</string>
+	<!-- OpenSource section -->
+	<string name="library_taptargetview_isOpenSource">true</string>
+	<string name="library_taptargetview_repositoryLink">https://github.com/KeepSafe/TapTargetView</string>
+	<!-- ClassPath for autoDetect section -->
+	<string name="library_taptargetview_classPath">com.getkeepsafe.taptargetview:taptargetview</string>
+	<!-- License section -->
+	<string name="library_taptargetview_licenseId">apache_2_0</string>
+	<!-- Custom variables section -->
+</resources>

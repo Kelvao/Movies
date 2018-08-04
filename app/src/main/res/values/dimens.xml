@@ -1,4 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="toolbar_size">?actionBarSize</dimen>
     <integer name="anim_duration_long">500</integer>
 </resources>

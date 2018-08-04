@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="define_int_icons"></string>
+    <!-- Author section -->
+    <string name="library_icons_author">Freepix</string>
+    <string name="library_icons_authorWebsite">http://www.freepik.com</string>
+    <!-- Library section -->
+    <string name="library_icons_libraryName">Icons</string>
+    <string name="library_icons_libraryDescription">Desert icon used to illustrate empty list and the Launcher icon</string>
+    <string name="library_icons_libraryWebsite">https://www.flaticon.com</string>
+    <!-- OpenSource section -->
+    <string name="library_icons_isOpenSource">false</string>
+    <!-- License section -->
+    <string name="library_icons_licenseId">cc30</string>
+</resources>

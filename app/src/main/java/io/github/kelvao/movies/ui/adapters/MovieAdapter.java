@@ -1,6 +1,8 @@
 package io.github.kelvao.movies.ui.adapters;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +11,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 
@@ -75,7 +81,19 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             GlideApp.with(movieItem.getContext())
                     .load(movie.getPoster())
                     .centerCrop()
-                    .error(movieItem.getContext().getDrawable(R.drawable.ic_broken_image))
+                    .error(R.drawable.ic_broken_image)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            movieViewHolder.iv_poster.setPadding(20, 0, 20, 0);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(movieViewHolder.iv_poster);
             movieViewHolder.tv_name_year.setText(String.format("%s (%s)", movie.getTitle(), movie.getYear()));
@@ -108,10 +126,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     class MovieViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.iv_poster)
-        ImageView iv_poster;
-        @BindView(R.id.tv_name_year)
-        TextView tv_name_year;
+        @BindView(R.id.iv_poster) ImageView iv_poster;
+        @BindView(R.id.tv_name_year) TextView tv_name_year;
 
         MovieViewHolder(View itemView) {
             super(itemView);
