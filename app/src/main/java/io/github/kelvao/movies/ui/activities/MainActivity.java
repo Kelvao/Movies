@@ -33,14 +33,16 @@ import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import io.github.kelvao.movies.BuildConfig;
 import io.github.kelvao.movies.R;
+import io.github.kelvao.movies.models.MovieListModel;
 import io.github.kelvao.movies.ui.adapters.SuggestionsAdapter;
+import io.github.kelvao.movies.ui.fragments.MovieFragment;
 import io.github.kelvao.movies.ui.fragments.MovieListFragment;
 import io.github.kelvao.movies.ui.utils.AnimationsHelper;
 import io.github.kelvao.movies.ui.utils.GlideApp;
 import io.github.kelvao.movies.ui.utils.TapTargetViewHelper;
 import io.github.kelvao.movies.utils.Constants;
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, SuggestionsAdapter.Callback {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, SuggestionsAdapter.Callback, MovieListFragment.MovieListCallback {
 
     @BindView(R.id.ctl_toolbar)
     CollapsingToolbarLayout ctl_toolbar;
@@ -72,46 +74,16 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         sharedPreferences = getSharedPreferences(BuildConfig.APPLICATION_ID, MODE_PRIVATE);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         animationsHelper = new AnimationsHelper(this);
+        animationsHelper.setCollapsingAnimation(false);
         initFragment();
         initSearchToolbar();
         suggestions = new ArrayList<>();
-        initRecyclerView();
-        animationsHelper.setCollapsingAnimation(false);
-    }
-
-    static void onNextLayout(final View view, final Runnable runnable) {
-        final ViewTreeObserver observer = view.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                final ViewTreeObserver trueObserver;
-                if (observer.isAlive()) {
-                    trueObserver = observer;
-                } else {
-                    trueObserver = view.getViewTreeObserver();
-                }
-                removeOnGlobalLayoutListener(trueObserver, this);
-                runnable.run();
-            }
-        });
-    }
-
-    static void removeOnGlobalLayoutListener(ViewTreeObserver observer,
-                                             ViewTreeObserver.OnGlobalLayoutListener listener) {
-        observer.removeOnGlobalLayoutListener(listener);
-    }
-
-    private void initRecyclerView() {
-        rv_suggestion.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rv_suggestion.setLayoutManager(linearLayoutManager);
-        adapter = new SuggestionsAdapter(suggestions, this);
-        rv_suggestion.setAdapter(adapter);
+        initSuggestionsRecyclerView();
     }
 
     private void initFragment() {
@@ -122,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .commit();
         v_shadow.setBackground(null);
     }
-
 
     private void initSearchToolbar() {
         iv_back.setOnClickListener(view -> animationsHelper.circleReveal(false, suggestions, adapter));
@@ -153,6 +124,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         adapter.filter(suggestions, editable.toString());
     }
 
+    private void initSuggestionsRecyclerView() {
+        rv_suggestion.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv_suggestion.setLayoutManager(linearLayoutManager);
+        adapter = new SuggestionsAdapter(suggestions, this);
+        rv_suggestion.setAdapter(adapter);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (showMenu) {
@@ -160,6 +140,28 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
         onNextLayout(toolbar, this::checkFirstRun);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    static void onNextLayout(final View view, final Runnable runnable) {
+        final ViewTreeObserver observer = view.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                final ViewTreeObserver trueObserver;
+                if (observer.isAlive()) {
+                    trueObserver = observer;
+                } else {
+                    trueObserver = view.getViewTreeObserver();
+                }
+                removeOnGlobalLayoutListener(trueObserver, this);
+                runnable.run();
+            }
+        });
+    }
+
+    static void removeOnGlobalLayoutListener(ViewTreeObserver observer,
+                                             ViewTreeObserver.OnGlobalLayoutListener listener) {
+        observer.removeOnGlobalLayoutListener(listener);
     }
 
     private void checkFirstRun() {
@@ -199,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .withLibraries(getResources().getStringArray(R.array.libraries))
                 .intent(this);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
 
@@ -288,5 +290,16 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     public void finish() {
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    @Override
+    public void OpenMovieDetails(MovieListModel.Movie movie) {
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.cfl_container, MovieFragment.newInstance(movie.getImdbID()))
+                .addToBackStack(Constants.MOVIE_FRAGMENT)
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_left)
+                .hide(movieListFragment)
+                .commit();
+        setCollapseInfo(movie.getTitle(), movie.getPoster());
     }
 }

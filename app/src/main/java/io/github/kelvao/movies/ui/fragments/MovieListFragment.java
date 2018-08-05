@@ -1,10 +1,8 @@
 package io.github.kelvao.movies.ui.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,8 +25,8 @@ import io.github.kelvao.movies.models.MovieListModel;
 import io.github.kelvao.movies.presenters.MovieListPresenter;
 import io.github.kelvao.movies.tasks.MovieList;
 import io.github.kelvao.movies.tasks.OnLoadMoreListener;
-import io.github.kelvao.movies.ui.activities.MainActivity;
 import io.github.kelvao.movies.ui.adapters.MovieAdapter;
+import io.github.kelvao.movies.ui.utils.Snack;
 import io.github.kelvao.movies.utils.Constants;
 
 public class MovieListFragment extends Fragment implements MovieList.View, OnLoadMoreListener, MovieAdapter.Callback {
@@ -45,6 +42,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
     private MovieList.Presenter presenter;
     private MovieAdapter adapter;
     private ArrayList<MovieListModel.Movie> movieList;
+    private MovieListCallback callback;
 
     public static MovieListFragment newInstance(String query) {
         Bundle args = new Bundle();
@@ -105,13 +103,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
 
     @Override
     public void onItemClick(MovieListModel.Movie movie) {
-        Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction()
-                .add(R.id.cfl_container, MovieFragment.newInstance(movie.getImdbID()))
-                .addToBackStack(Constants.MOVIE_FRAGMENT)
-                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_left)
-                .hide(this)
-                .commit();
-        ((MainActivity) getActivity()).setCollapseInfo(movie.getTitle(), movie.getPoster());
+        callback.OpenMovieDetails(movie);
     }
 
     @Override
@@ -142,12 +134,7 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
     @Override
     public void onSuccess() {
         if (getActivity() != null) {
-            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), getText(R.string.search_success), Snackbar.LENGTH_LONG);
-            View sbView = snackbar.getView();
-            sbView.setBackgroundColor(Color.WHITE);
-            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setTextColor(Color.BLACK);
-            snackbar.show();
+            Snack.Success(getActivity());
         }
     }
 
@@ -155,12 +142,23 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
     public void onFailed(String message) {
         updateUi(false);
         if (getActivity() != null) {
-            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), message, Snackbar.LENGTH_LONG);
-            View sbView = snackbar.getView();
-            sbView.setBackgroundColor(Color.WHITE);
-            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setTextColor(Color.RED);
-            snackbar.show();
+            Snack.Error(getActivity(), message);
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            callback = (MovieListCallback) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement MovieListCallback");
+        }
+
+    }
+
+    public interface MovieListCallback {
+        void OpenMovieDetails(MovieListModel.Movie movie);
     }
 }

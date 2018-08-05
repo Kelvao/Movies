@@ -27,17 +27,19 @@ import io.github.kelvao.movies.ui.adapters.SuggestionsAdapter;
 
 public class AnimationsHelper {
 
-    @BindView(R.id.search_toolbar) ConstraintLayout search_toolbar;
-    @BindView(R.id.et_query) EditText et_query;
-    @BindView(R.id.rv_suggestions) RecyclerView rv_suggestion;
-    @BindView(R.id.abl_toolbar) AppBarLayout abl_toolbar;
+    @BindView(R.id.search_toolbar)
+    ConstraintLayout search_toolbar;
+    @BindView(R.id.et_query)
+    EditText et_query;
+    @BindView(R.id.rv_suggestions)
+    RecyclerView rv_suggestion;
+    @BindView(R.id.abl_toolbar)
+    AppBarLayout abl_toolbar;
     private Context context;
-    private Activity activity;
 
-    public AnimationsHelper(Activity activity) {
-        this.context = activity.getBaseContext();
-        this.activity = activity;
-        ButterKnife.bind(this, activity);
+    public AnimationsHelper(Context context) {
+        this.context = context;
+        ButterKnife.bind(this, (Activity) context);
     }
 
     public void circleReveal(boolean isShow, ArrayList<String> suggestions, SuggestionsAdapter adapter) {
@@ -67,11 +69,11 @@ public class AnimationsHelper {
         int cy = search_toolbar.getHeight() / 2;
         Animator anim;
         if (isShow) {
-            KeyboardHelper.showSoftKeyboard(context);
             et_query.requestFocus();
+            SoftKeyboardHelper.openKeyboard(context);
             anim = ViewAnimationUtils.createCircularReveal(search_toolbar, cx, cy, 0, (float) width);
         } else {
-            KeyboardHelper.hideSoftKeyboard(context, activity);
+            SoftKeyboardHelper.closeKeyboard(context);
             et_query.clearFocus();
             anim = ViewAnimationUtils.createCircularReveal(search_toolbar, cx, cy, (float) width, 0);
         }

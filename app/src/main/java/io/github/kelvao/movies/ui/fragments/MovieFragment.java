@@ -1,9 +1,7 @@
 package io.github.kelvao.movies.ui.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,28 +28,20 @@ import io.github.kelvao.movies.presenters.MoviePresenter;
 import io.github.kelvao.movies.tasks.Movie;
 import io.github.kelvao.movies.ui.adapters.GenreAdapter;
 import io.github.kelvao.movies.ui.adapters.RatingAdapter;
+import io.github.kelvao.movies.ui.utils.Snack;
 import io.github.kelvao.movies.utils.Constants;
 
 public class MovieFragment extends Fragment implements Movie.View {
 
-    @BindView(R.id.tv_released)
-    TextView tv_released;
-    @BindView(R.id.tv_director)
-    TextView tv_director;
-    @BindView(R.id.tv_writer)
-    TextView tv_writer;
-    @BindView(R.id.tv_rated)
-    TextView tv_rated;
-    @BindView(R.id.tv_plot)
-    TextView tv_plot;
-    @BindView(R.id.rv_genre)
-    RecyclerView rv_genre;
-    @BindView(R.id.rv_ratings)
-    RecyclerView rv_ratings;
-    @BindView(R.id.sv_movie)
-    ScrollView sv_movie;
-    @BindView(R.id.pg_movie)
-    ProgressBar pg_movie;
+    @BindView(R.id.tv_released) TextView tv_released;
+    @BindView(R.id.tv_director) TextView tv_director;
+    @BindView(R.id.tv_writer) TextView tv_writer;
+    @BindView(R.id.tv_rated) TextView tv_rated;
+    @BindView(R.id.tv_plot) TextView tv_plot;
+    @BindView(R.id.rv_genre) RecyclerView rv_genre;
+    @BindView(R.id.rv_ratings) RecyclerView rv_ratings;
+    @BindView(R.id.sv_movie) ScrollView sv_movie;
+    @BindView(R.id.pg_movie) ProgressBar pg_movie;
     private ArrayList<String> genres;
     private ArrayList<MovieModel.Rating> ratings;
 
@@ -112,16 +102,11 @@ public class MovieFragment extends Fragment implements Movie.View {
     @Override
     public void onFailed(String message) {
         if (getActivity() != null) {
-            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_movies), message, Snackbar.LENGTH_LONG);
-            View sbView = snackbar.getView();
-            sbView.setBackgroundColor(Color.WHITE);
-            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setTextColor(Color.RED);
-            snackbar.show();
+            Snack.Error(getActivity(), message);
         }
     }
 
-    public void updateUi(boolean isLoading){
+    public void updateUi(boolean isLoading) {
         pg_movie.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         sv_movie.setVisibility(isLoading ? View.GONE : View.VISIBLE);
     }
