@@ -81,12 +81,12 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             GlideApp.with(movieItem.getContext())
                     .load(movie.getPoster())
                     .centerCrop()
-                    .error(R.drawable.ic_broken_image)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            movieViewHolder.iv_poster.setPadding(20, 0, 20, 0);
-                            return true;
+                            movieViewHolder.iv_error.setVisibility(View.VISIBLE);
+                            return false;
                         }
 
                         @Override
@@ -94,8 +94,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             return false;
                         }
                     })
-                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(movieViewHolder.iv_poster);
+
             movieViewHolder.tv_name_year.setText(String.format("%s (%s)", movie.getTitle(), movie.getYear()));
             movieItem.setOnClickListener(view -> callback.onItemClick(movie));
         }
@@ -126,8 +126,12 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     class MovieViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.iv_poster) ImageView iv_poster;
-        @BindView(R.id.tv_name_year) TextView tv_name_year;
+        @BindView(R.id.iv_poster)
+        ImageView iv_poster;
+        @BindView(R.id.iv_error)
+        ImageView iv_error;
+        @BindView(R.id.tv_name_year)
+        TextView tv_name_year;
 
         MovieViewHolder(View itemView) {
             super(itemView);
