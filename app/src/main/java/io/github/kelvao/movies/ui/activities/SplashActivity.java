@@ -19,7 +19,6 @@ public class SplashActivity extends AppCompatActivity {
     private Runnable waitCallbackMain = () -> {
         startActivity(new Intent(SplashActivity.this, MainActivity.class));
         finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     };
 
     @Override
@@ -29,5 +28,11 @@ public class SplashActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         tv_version.setText(String.format("v%s", BuildConfig.VERSION_NAME));
         waitHandler.postDelayed(waitCallbackMain, 3000);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

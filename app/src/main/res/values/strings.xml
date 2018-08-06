@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Movies</string>
-    <string name="movie_list_empty">Movie list empty.</string>
+    <string name="movie_list_empty">Movie list empty.\nMake a new Search.</string>
     <string name="searchbar_hint">Search…</string>
     <string name="action_search">Search</string>
     <string name="action_about">About</string>
+    <string name="network_message">Please, check your internet connection</string>
+    <string name="retry">Retry</string>
+    <string name="welcome_message">Welcome! Make a search.</string>
     <string name="search_success">Completed search with success.</string>
     <string name="about">About</string>
     <string name="hint_genre">Genre:</string>

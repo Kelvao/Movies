@@ -1,6 +1,7 @@
 package io.github.kelvao.movies.ui.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +36,7 @@ import butterknife.OnTextChanged;
 import io.github.kelvao.movies.BuildConfig;
 import io.github.kelvao.movies.R;
 import io.github.kelvao.movies.models.MovieListModel;
+import io.github.kelvao.movies.receivers.NetworkChangeReceiver;
 import io.github.kelvao.movies.ui.adapters.SuggestionsAdapter;
 import io.github.kelvao.movies.ui.fragments.MovieFragment;
 import io.github.kelvao.movies.ui.fragments.MovieListFragment;
@@ -42,7 +45,10 @@ import io.github.kelvao.movies.ui.utils.GlideApp;
 import io.github.kelvao.movies.ui.utils.TapTargetViewHelper;
 import io.github.kelvao.movies.utils.Constants;
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, SuggestionsAdapter.Callback, MovieListFragment.MovieListCallback {
+import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
+        SuggestionsAdapter.Callback, MovieListFragment.MovieListCallback, NetworkChangeReceiver.NetworkChange {
 
     @BindView(R.id.ctl_toolbar)
     CollapsingToolbarLayout ctl_toolbar;
@@ -68,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     private ArrayList<String> suggestions;
     private SharedPreferences sharedPreferences = null;
     private AnimationsHelper animationsHelper;
+    private NetworkChangeReceiver networkChangeReceiver;
+    private IntentFilter intentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,19 +88,28 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         animationsHelper = new AnimationsHelper(this);
         animationsHelper.setCollapsingAnimation(false);
+        suggestions = new ArrayList<>();
+        initNetworkChangeReceiver();
         initFragment();
         initSearchToolbar();
-        suggestions = new ArrayList<>();
         initSuggestionsRecyclerView();
+    }
+
+    private void initNetworkChangeReceiver() {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(CONNECTIVITY_ACTION);
+        networkChangeReceiver = new NetworkChangeReceiver();
+        networkChangeReceiver.setNetworkChange(this);
     }
 
     private void initFragment() {
         movieListFragment = MovieListFragment.newInstance(et_query.getText().toString());
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(0, 0, R.anim.slide_in_right, R.anim.slide_out_right)
-                .replace(R.id.cfl_container, movieListFragment)
+                .replace(R.id.cfl_container, movieListFragment, Constants.MOVIE_LIST_FRAGMENT)
                 .commit();
         v_shadow.setBackground(null);
+
     }
 
     private void initSearchToolbar() {
@@ -201,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .withLibraries(getResources().getStringArray(R.array.libraries))
                 .intent(this);
         startActivity(intent);
-        //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
 
@@ -246,10 +263,17 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
+    protected void onResume() {
+        registerReceiver(networkChangeReceiver, intentFilter);
+        super.onResume();
+    }
+
+    @Override
     protected void onPause() {
         if (search_toolbar.getVisibility() == View.VISIBLE) {
             animationsHelper.circleReveal(false, suggestions, adapter);
         }
+        unregisterReceiver(networkChangeReceiver);
         super.onPause();
     }
 
@@ -295,11 +319,24 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void OpenMovieDetails(MovieListModel.Movie movie) {
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.cfl_container, MovieFragment.newInstance(movie.getImdbID()))
+                .add(R.id.cfl_container, MovieFragment.newInstance(movie.getImdbID()), Constants.MOVIE_FRAGMENT)
                 .addToBackStack(Constants.MOVIE_FRAGMENT)
                 .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_left)
                 .hide(movieListFragment)
                 .commit();
         setCollapseInfo(movie.getTitle(), movie.getPoster());
+    }
+
+    @Override
+    public void OnNetworkChanged(int status) {
+        if (getSupportFragmentManager().findFragmentByTag(Constants.MOVIE_LIST_FRAGMENT) == null
+                && getSupportFragmentManager().findFragmentByTag(Constants.MOVIE_FRAGMENT) == null
+                && status == Constants.NETWORK_CONNECTED) {
+            initFragment();
+        } else if (status == Constants.NETWORK_DESCONNECTED) {
+            startActivity(new Intent(this, NetworkActivity.class));
+            finish();
+        }
+        Log.i("TESTE", "OnNetworkChanged: " + status);
     }
 }

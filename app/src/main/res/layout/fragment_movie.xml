@@ -8,16 +8,16 @@
 
     <ScrollView
         android:id="@+id/sv_movie"
-        android:nestedScrollingEnabled="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
         android:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/cl_movie_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp">
+            android:padding="16dp">
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/cl_first_info"

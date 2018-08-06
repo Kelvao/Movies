@@ -13,9 +13,13 @@ public class Constants {
     private static final String API_KEY = "45d162c8";
     private static final String QUERY = "query";
     public static final String MOVIE_FRAGMENT = "movie_fragment";
+    public static final String MOVIE_LIST_FRAGMENT = "movie_list_fragment";
+    public static final String WELCOME_FRAGMENT = "welcome_fragment";
     private static final String IMAGE_OLD_SIZE = Image.OLD_SIZE;
     private static final String IMAGE_NEW_SIZE = Image.NEW_SIZE;
     private static final String FIRST_RUN = "fistrun";
+    public static final int NETWORK_CONNECTED = 1;
+    public static final int NETWORK_DESCONNECTED = 0;
 
     public static String getImdbId() {
         return IMDB_ID;

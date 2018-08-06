@@ -60,8 +60,11 @@ public class MovieListFragment extends Fragment implements MovieList.View, OnLoa
         movieList = new ArrayList<>();
         presenter = new MovieListPresenter(this);
         initRecyclerView();
-        if (getArguments() != null) {
+        if (getArguments() != null && !"".equals(getArguments().getString(Constants.getQuery()))) {
             queryMovies(getArguments().getString(Constants.getQuery()));
+        } else {
+            tv_empty.setText(getText(R.string.welcome_message));
+            updateUi(false);
         }
         return fragment_movie_list;
     }
