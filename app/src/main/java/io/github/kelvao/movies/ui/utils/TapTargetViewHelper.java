@@ -32,7 +32,7 @@ public class TapTargetViewHelper {
         activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int screenWidth = displaymetrics.widthPixels;
         int screenHeight = displaymetrics.heightPixels;
-        final Drawable movie = ContextCompat.getDrawable(context, R.drawable.ic_movie);
+        final Drawable movie = ContextCompat.getDrawable(context, R.drawable.ic_view_list);
         final Rect movieTarget = new Rect(0, 0,
                 (movie != null ? movie.getIntrinsicWidth() : 0 ) * 2,
                 (movie != null ? movie.getIntrinsicHeight() : 0) * 2);
@@ -45,7 +45,6 @@ public class TapTargetViewHelper {
                                 .targetCircleColor(android.R.color.white)
                                 .titleTextColor(android.R.color.white)
                                 .descriptionTextColor(android.R.color.white)
-                                .descriptionTextAlpha(0.4f)
                                 .drawShadow(true)
                                 .cancelable(true)
                                 .tintTarget(true),
@@ -54,7 +53,6 @@ public class TapTargetViewHelper {
                                 .targetCircleColor(android.R.color.white)
                                 .titleTextColor(android.R.color.white)
                                 .descriptionTextColor(android.R.color.white)
-                                .descriptionTextAlpha(0.4f)
                                 .drawShadow(true)
                                 .cancelable(true)
                                 .tintTarget(true),
@@ -63,7 +61,6 @@ public class TapTargetViewHelper {
                                 .targetCircleColor(android.R.color.white)
                                 .titleTextColor(android.R.color.white)
                                 .descriptionTextColor(android.R.color.white)
-                                .descriptionTextAlpha(0.4f)
                                 .icon(movie)
                                 .cancelable(true)
                                 .tintTarget(true)
