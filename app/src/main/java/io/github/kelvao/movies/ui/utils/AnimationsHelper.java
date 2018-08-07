@@ -131,7 +131,7 @@ public class AnimationsHelper {
         } else {
             abl_toolbar.setExpanded(false, false);
         }
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) abl_toolbar.getLayoutParams();
+        CoordinatorLayout.LayoutParams actionbar = (CoordinatorLayout.LayoutParams) abl_toolbar.getLayoutParams();
         final AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
         if (isShow) {
             ValueAnimator valueAnimator = ValueAnimator.ofInt();
@@ -150,7 +150,7 @@ public class AnimationsHelper {
                 return isShow;
             }
         });
-        params.setBehavior(behavior);
+        actionbar.setBehavior(behavior);
     }
 
 }

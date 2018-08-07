@@ -23,7 +23,7 @@
     <string name="tutorial_list_title">List of Movies</string>
     <string name="tutorial_list_description">The search result will appear here in list.\nTap one movie from list to see more details.</string>
     <string name="about_title">About</string>
-    <string name="about_description">Android App </string>
+    <string name="about_description">Android App to search movies from OMDb Api.</string>
     <string-array name="libraries">
         <item>icons</item>
         <item>taptargetview</item>
