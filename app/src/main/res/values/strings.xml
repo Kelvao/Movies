@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Movies</string>
-    <string name="movie_list_empty">Movie list empty.\nMake a new Search.</string>
+    <string name="movie_list_empty">Movie list empty.\nDo a new Search.</string>
     <string name="searchbar_hint">Search…</string>
     <string name="action_search">Search</string>
     <string name="action_about">About</string>
     <string name="network_message">Please, check your internet connection</string>
     <string name="retry">Retry</string>
-    <string name="welcome_message">Welcome! Make a search.</string>
+    <string name="welcome_message">Welcome! Do a search.</string>
     <string name="search_success">Completed search with success.</string>
     <string name="hint_genre">Genre:</string>
     <string name="hint_plot">Plot:</string>
@@ -21,9 +21,9 @@
     <string name="tutorial_about_title">About App</string>
     <string name="tutorial_about_description">Tap here to see informations about this App and the libraries used.</string>
     <string name="tutorial_list_title">List of Movies</string>
-    <string name="tutorial_list_description">All your search movies will appear here in list form.\nTap one to see more details.</string>
+    <string name="tutorial_list_description">The search result will appear here in list.\nTap one movie from list to see more details.</string>
     <string name="about_title">About</string>
-    <string name="about_description">Description</string>
+    <string name="about_description">Android App </string>
     <string-array name="libraries">
         <item>icons</item>
         <item>taptargetview</item>

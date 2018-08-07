@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     CollapsingToolbarLayout ctl_toolbar;
     @BindView(R.id.iv_poster)
     ImageView iv_poster;
-    @BindView(R.id.v_shadow)
-    View v_shadow;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.search_toolbar)
@@ -108,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .setCustomAnimations(0, 0, R.anim.slide_in_right, R.anim.slide_out_right)
                 .replace(R.id.cfl_container, movieListFragment, Constants.MOVIE_LIST_FRAGMENT)
                 .commit();
-        v_shadow.setBackground(null);
-
     }
 
     private void initSearchToolbar() {
@@ -285,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(iv_poster);
         ctl_toolbar.setTitle(title);
-        v_shadow.setBackground(getDrawable(R.drawable.collapsed_image_background));
     }
 
     @Override

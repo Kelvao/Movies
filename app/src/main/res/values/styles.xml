@@ -5,12 +5,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:navigationBarColor">@color/colorAccent</item>
         <item name="cardViewStyle">@style/CardView</item>
         <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>
         <item name="colorControlNormal">@android:color/white</item>
-        <item name="about_libraries_title_description">
-            @android:color/white
-        </item>
+        <item name="about_libraries_title_description">@android:color/white</item>
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
     </style>
 

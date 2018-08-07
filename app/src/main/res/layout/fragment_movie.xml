@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:nestedScrollingEnabled="true"
-        android:visibility="gone">
+        >
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/cl_movie_info"
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/hint_rated"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="@color/colorAccent"
                     android:textSize="16sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_rated"
@@ -76,10 +76,9 @@
                 <TextView
                     android:id="@+id/tv_rated"
                     android:layout_width="50dp"
-                    android:layout_height="20dp"
+                    android:layout_height="22dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rated_item_background"
-                    android:foregroundGravity="center"
                     android:gravity="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
